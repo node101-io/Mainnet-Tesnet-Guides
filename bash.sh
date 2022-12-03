@@ -1,6 +1,6 @@
-#!/bin/bash
+#! /bin/bash
 
-echo -e '\e[40m\e[92m'                                                                
+echo -e '\e[0m'                                                              
 echo -e '@@@  @@@   @@@@@@   @@@@@@@   @@@@@@@@    @@@   @@@@@@@@     @@@
 echo -e '@@@@ @@@  @@@@@@@@  @@@@@@@@  @@@@@@@@   @@@@  @@@@@@@@@@   @@@@
 echo -e '@@!@!@@@  @@!  @@@  @@!  @@@  @@!       @@@!!  @@!   @@@@  @@@!!
@@ -15,9 +15,10 @@ echo -e '\e[0m'
 
 
 # Variables by node101
+
 EXECUTE=bandd
 CHAIN_ID=laozi-mainnet
-RPC_PORT=56
+PORT=56
 SYSTEM_FOLDER=.band
 PROJECT_FOLDER=chain
 VERSION=v2.3.3
@@ -61,12 +62,10 @@ if [ ! $WALLET_NAME ]; then
 fi
 
 # Updates by node101
-echo -e "\e[1m\e[32m1. GUNCELLEMELER YUKLENIYOR... \e[0m" && sleep 1
 sudo apt update && sudo apt upgrade -y && sudo apt install curl tar wget clang pkg-config libssl-dev jq build-essential bsdmainutils git make ncdu gcc git jq chrony liblz4-tool -y
 
 ver="1.19.3"
 cd $HOME
-
 wget "https://golang.org/dl/go$ver.linux-amd64.tar.gz"
 sudo rm -rf /usr/local/go
 sudo tar -C /usr/local -xzf "go$ver.linux-amd64.tar.gz"
@@ -150,7 +149,7 @@ sudo systemctl enable $EXECUTE
 sudo systemctl restart $EXECUTE
 
 echo '=============== SETUP IS FINISHED ==================='
-echo -e 'CHECK OUT YOUR LOGS : \e[1m\e[32mjournalctl -fu $(which $EXECUTE) -o cat\e[0m'
+echo -e "CHECK OUT YOUR LOGS : \e[1m\e[32mjournalctl -fu ${EXECUTE} -o cat\e[0m"
 echo -e "CHECK SYNC: \e[1m\e[32mcurl -s localhost:${PORT}657/status | jq .result.sync_info\e[0m"
 
 source $HOME/.bash_profile

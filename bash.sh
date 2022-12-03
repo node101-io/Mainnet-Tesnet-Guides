@@ -98,8 +98,6 @@ fi
 # ADDRBOOK and GENESIS
 wget $GENESIS_FILE -O $HOME/$SYSTEM_FOLDER/config/genesis.json
 wget $ADDRBOOK -O $HOME/$SYSTEM_FOLDER/config/addrbook.json
-wget $SNAPSHOT_URL -O $HOME/$SYSTEM_FOLDER/config/genesis.json | tar xvz -C $HOME/$SYSTEM_FOLDER/
-
 
 SEEDS="$SEEDS"
 PEERS="$PEERS"

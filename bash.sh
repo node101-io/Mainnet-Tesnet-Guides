@@ -1,17 +1,20 @@
 #! /bin/bash
 
-echo -e '\e[0m'                                                              
-echo -e '@@@  @@@   @@@@@@   @@@@@@@   @@@@@@@@    @@@   @@@@@@@@     @@@'
-echo -e '@@@@ @@@  @@@@@@@@  @@@@@@@@  @@@@@@@@   @@@@  @@@@@@@@@@   @@@@'
-echo -e '@@!@!@@@  @@!  @@@  @@!  @@@  @@!       @@@!!  @@!   @@@@  @@@!!'
-echo -e '!@!!@!@!  !@!  @!@  !@!  @!@  !@!         !@!  !@!  @!@!@    !@!'
-echo -e '@!@ !!@!  @!@  !@!  @!@  !@!  @!!!:!:     @!@  @!@ @! !@!    @!@'
-echo -e '!@!  !!!  !@!  !!!  !@!  !!!  !!!!!::     !@!  !@!!!  !!!    !@!'
-echo -e '!!:  !!!  !!:  !!!  !!:  !!!  !!:         !!:  !!:!   !!!    !!:'
-echo -e ':!:  !:!  :!:  !:!  :!:  !:!  :!:         :!:  :!:    !:!    :!:'
-echo -e ':::   ::   ::::::   :::::::   :::::::     :::   ::::::::     :::'
-echo -e '\e[0m'
-
+exists()
+{
+  command -v "$1" >/dev/null 2>&1
+}
+if exists curl; then
+	echo ''
+else
+   apt install curl -y < "/dev/null"
+fi
+echo "=================================================="
+curl -s https://raw.githubusercontent.com/MechuLm/learn/main/node101logo.sh | bash && sleep 2
+echo "=================================================="
+if [[ $(/usr/bin/id -u) -ne 0 ]]; then
+    echo "Aborting: run as root user!"
+    exit 1
 
 # Variables
 
@@ -29,7 +32,6 @@ MIN_GAS=0
 DENOM=uband
 SEEDS=7490c272d1c9db40b7b9b61b0df3bb4365cb63a6@loyal-seed.netdots.net:26656,b66ecdf36bb19a9af0460b3ae0901aece93ae006@pubnode1.joinloyal.io:26656
 PEERS=
-SNAPSHOT_URL=https://dl2.quicksync.io/laozi-mainnet-pruned.20221203.1510.tar.lz4
 
 sleep 2
 

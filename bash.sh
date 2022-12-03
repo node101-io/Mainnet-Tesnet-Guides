@@ -15,6 +15,7 @@ echo "=================================================="
 if [[ $(/usr/bin/id -u) -ne 0 ]]; then
     echo "Aborting: run as root user!"
     exit 1
+fi
 
 # Variables
 

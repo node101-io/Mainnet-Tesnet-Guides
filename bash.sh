@@ -1,23 +1,16 @@
 #! /bin/bash
 
-exists()
-{
-  command -v "$1" >/dev/null 2>&1
-}
-if exists curl; then
-	echo ''
-else
-   apt install curl -y < "/dev/null"
-fi
-echo "=================================================="
-curl -s https://raw.githubusercontent.com/MechuLm/learn/main/node101logo.sh | bash && sleep 2
-echo "=================================================="
-if [[ $(/usr/bin/id -u) -ne 0 ]]; then
-    echo "Aborting: run as root user!"
-    exit 1
-fi
-
-echo -e 'Setup started\n'
+echo -e '\e[0m'                                                              
+echo -e '@@@  @@@   @@@@@@   @@@@@@@   @@@@@@@@    @@@   @@@@@@@@     @@@'
+echo -e '@@@@ @@@  @@@@@@@@  @@@@@@@@  @@@@@@@@   @@@@  @@@@@@@@@@   @@@@'
+echo -e '@@!@!@@@  @@!  @@@  @@!  @@@  @@!       @@@!!  @@!   @@@@  @@@!!'
+echo -e '!@!!@!@!  !@!  @!@  !@!  @!@  !@!         !@!  !@!  @!@!@    !@!'
+echo -e '@!@ !!@!  @!@  !@!  @!@  !@!  @!!!:!:     @!@  @!@ @! !@!    @!@'
+echo -e '!@!  !!!  !@!  !!!  !@!  !!!  !!!!!::     !@!  !@!!!  !!!    !@!'
+echo -e '!!:  !!!  !!:  !!!  !!:  !!!  !!:         !!:  !!:!   !!!    !!:'
+echo -e ':!:  !:!  :!:  !:!  :!:  !:!  :!:         :!:  :!:    !:!    :!:'
+echo -e ':::   ::   ::::::   :::::::   :::::::     :::   ::::::::     :::'
+echo -e '\e[0m'
 
 # Variables
 

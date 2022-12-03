@@ -29,6 +29,7 @@ MIN_GAS=0
 DENOM=uband
 SEEDS=7490c272d1c9db40b7b9b61b0df3bb4365cb63a6@loyal-seed.netdots.net:26656,b66ecdf36bb19a9af0460b3ae0901aece93ae006@pubnode1.joinloyal.io:26656
 PEERS=
+SNAPSHOT_URL=https://dl2.quicksync.io/laozi-mainnet-pruned.20221203.1510.tar.lz4
 
 sleep 2
 
@@ -62,7 +63,8 @@ fi
 
 # Updates
 
-sudo apt update && sudo apt upgrade -y && sudo apt install curl tar wget clang pkg-config libssl-dev jq build-essential bsdmainutils git make ncdu gcc git jq chrony liblz4-tool -y && sudo apt install make clang pkg-config libssl-dev build-essential git jq ncdu bsdmainutils htop net-tools lsof -y < "/dev/null"
+sudo apt update && sudo apt upgrade -y && sudo apt install curl tar wget clang pkg-config libssl-dev jq build-essential bsdmainutils git make ncdu gcc git jq chrony liblz4-tool -y && sudo apt install make clang pkg-config libssl-dev build-essential git jq ncdu bsdmainutils htop net-tools lsof -y < "/dev/null"  && sudo apt-get update -y 
+sudo apt-get install wget liblz4-tool aria2 -y 
 
 ver="1.19.3"
 cd $HOME
@@ -94,6 +96,8 @@ fi
 # ADDRBOOK and GENESIS
 wget $GENESIS_FILE -O $HOME/$SYSTEM_FOLDER/config/genesis.json
 wget $ADDRBOOK -O $HOME/$SYSTEM_FOLDER/config/addrbook.json
+wget $SNAPSHOT_URL -O $HOME/$SYSTEM_FOLDER/config/genesis.json | tar xvz -C $HOME/$SYSTEM_FOLDER/
+
 
 SEEDS="$SEEDS"
 PEERS="$PEERS"
@@ -152,8 +156,6 @@ echo -e "CHECK OUT YOUR LOGS : \e[1m\e[32mjournalctl -fu ${EXECUTE} -o cat\e[0m"
 echo -e "CHECK SYNC: \e[1m\e[32mcurl -s localhost:${PORT}657/status | jq .result.sync_info\e[0m"
 
 source $HOME/.bash_profile
-
-cd $PROJECT_FOLDER
 
 
 

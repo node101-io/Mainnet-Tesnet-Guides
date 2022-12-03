@@ -1,20 +1,19 @@
 #! /bin/bash
 
 echo -e '\e[0m'                                                              
-echo -e '@@@  @@@   @@@@@@   @@@@@@@   @@@@@@@@    @@@   @@@@@@@@     @@@
-echo -e '@@@@ @@@  @@@@@@@@  @@@@@@@@  @@@@@@@@   @@@@  @@@@@@@@@@   @@@@
-echo -e '@@!@!@@@  @@!  @@@  @@!  @@@  @@!       @@@!!  @@!   @@@@  @@@!!
-echo -e '!@!!@!@!  !@!  @!@  !@!  @!@  !@!         !@!  !@!  @!@!@    !@!
-echo -e '@!@ !!@!  @!@  !@!  @!@  !@!  @!!!:!      @!@  @!@ @! !@!    @!@
-echo -e '!@!  !!!  !@!  !!!  !@!  !!!  !!!!!:      !@!  !@!!!  !!!    !@!
-echo -e '!!:  !!!  !!:  !!!  !!:  !!!  !!:         !!:  !!:!   !!!    !!:
-echo -e ':!:  !:!  :!:  !:!  :!:  !:!  :!:         :!:  :!:    !:!    :!:
-echo -e '::    ::  ::::: ::   :::: ::  ::::::      :::  ::::::::::    :::
-echo -e '::     :   : :  :    :: ::    : :: ::     :::  ::::::::::    :::
+echo -e '@@@  @@@   @@@@@@   @@@@@@@   @@@@@@@@    @@@   @@@@@@@@     @@@'
+echo -e '@@@@ @@@  @@@@@@@@  @@@@@@@@  @@@@@@@@   @@@@  @@@@@@@@@@   @@@@'
+echo -e '@@!@!@@@  @@!  @@@  @@!  @@@  @@!       @@@!!  @@!   @@@@  @@@!!'
+echo -e '!@!!@!@!  !@!  @!@  !@!  @!@  !@!         !@!  !@!  @!@!@    !@!'
+echo -e '@!@ !!@!  @!@  !@!  @!@  !@!  @!!!:!:     @!@  @!@ @! !@!    @!@'
+echo -e '!@!  !!!  !@!  !!!  !@!  !!!  !!!!!::     !@!  !@!!!  !!!    !@!'
+echo -e '!!:  !!!  !!:  !!!  !!:  !!!  !!:         !!:  !!:!   !!!    !!:'
+echo -e ':!:  !:!  :!:  !:!  :!:  !:!  :!:         :!:  :!:    !:!    :!:'
+echo -e ':::   ::  ::::::::  :::::::   :::::::     :::  ::::::::::    :::'
 echo -e '\e[0m'
 
 
-# Variables by node101
+# Variables
 
 EXECUTE=bandd
 CHAIN_ID=laozi-mainnet
@@ -61,8 +60,9 @@ if [ ! $WALLET_NAME ]; then
 	echo 'export WALLET_NAME='$WALLET_NAME >> $HOME/.bash_profile
 fi
 
-# Updates by node101
-sudo apt update && sudo apt upgrade -y && sudo apt install curl tar wget clang pkg-config libssl-dev jq build-essential bsdmainutils git make ncdu gcc git jq chrony liblz4-tool -y
+# Updates
+
+sudo apt update && sudo apt upgrade -y && sudo apt install curl tar wget clang pkg-config libssl-dev jq build-essential bsdmainutils git make ncdu gcc git jq chrony liblz4-tool -y && sudo apt install make clang pkg-config libssl-dev build-essential git jq ncdu bsdmainutils htop net-tools lsof -y < "/dev/null"
 
 ver="1.19.3"
 cd $HOME
@@ -91,7 +91,7 @@ if [ $BIN_FILES_URL ]; then
 fi
 
 
-# ADDRBOOK ve GENESIS by node101
+# ADDRBOOK and GENESIS
 wget $GENESIS_FILE -O $HOME/$SYSTEM_FOLDER/config/genesis.json
 wget $ADDRBOOK -O $HOME/$SYSTEM_FOLDER/config/addrbook.json
 
@@ -103,7 +103,7 @@ sed -i.bak -e "s/^persistent_peers *=.*/persistent_peers = \"$PEERS\"/" $HOME/$S
 
 sleep 1
 
-# config pruning
+# config prunings
 pruning="custom"
 pruning_keep_recent="100"
 pruning_keep_every="0"
@@ -113,7 +113,7 @@ sed -i -e "s/^pruning-keep-recent *=.*/pruning-keep-recent = \"$pruning_keep_rec
 sed -i -e "s/^pruning-keep-every *=.*/pruning-keep-every = \"$pruning_keep_every\"/" $HOME/$SYSTEM_FOLDER/config/app.toml
 sed -i -e "s/^pruning-interval *=.*/pruning-interval = \"$pruning_interval\"/" $HOME/$SYSTEM_FOLDER/config/app.toml
 
-# PORTLAR by us
+# PORTS
 
 sed -i.bak -e "s%^proxy_app = \"tcp://127.0.0.1:26658\"%proxy_app = \"tcp://127.0.0.1:2${PORT}8\"%; s%^laddr = \"tcp://127.0.0.1:26657\"%laddr = \"tcp://127.0.0.1:2${PORT}7\"%; s%^pprof_laddr = \"localhost:6060\"%pprof_laddr = \"localhost:${PORT}60\"%; s%^laddr = \"tcp://0.0.0.0:26656\"%laddr = \"tcp://0.0.0.0:2${PORT}6\"%; s%^prometheus_listen_addr = \":26660\"%prometheus_listen_addr = \":2${PORT}0\"%" $HOME/$SYSTEM_FOLDER/config/config.toml
 sed -i.bak -e "s%^address = \"tcp://0.0.0.0:1317\"%address = \"tcp://0.0.0.0:${PORT}7\"%; s%^address = \":8080\"%address = \":${PORT}80\"%; s%^address = \"0.0.0.0:9090\"%address = \"0.0.0.0:${PORT}90\"%; s%^address = \"0.0.0.0:9091\"%address = \"0.0.0.0:${PORT}91\"%" $HOME/$SYSTEM_FOLDER/config/app.toml
@@ -143,7 +143,6 @@ LimitNOFILE=65535
 WantedBy=multi-user.target
 EOF
 
-
 sudo systemctl daemon-reload
 sudo systemctl enable $EXECUTE
 sudo systemctl restart $EXECUTE
@@ -154,6 +153,7 @@ echo -e "CHECK SYNC: \e[1m\e[32mcurl -s localhost:${PORT}657/status | jq .result
 
 source $HOME/.bash_profile
 
+cd $PROJECT_FOLDER
 
 
 

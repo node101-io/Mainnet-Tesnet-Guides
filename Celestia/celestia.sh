@@ -30,26 +30,26 @@ PEERS=e4429e99609c8c009969b0eb73c973bff33712f9@141.94.73.39:43656,09263a4168de6a
 
 sleep 2
 
-echo "export EXECUTE=${EXECUTE}" >> $HOME/.bash_profile
-echo "export CHAIN_ID=${CHAIN_ID}" >> $HOME/.bash_profile
-echo "export PORT=${PORT}" >> $HOME/.bash_profile
-echo "export SYSTEM_FOLDER=${SYSTEM_FOLDER}" >> $HOME/.bash_profile
-echo "export PROJECT_FOLDER=${PROJECT_FOLDER}" >> $HOME/.bash_profile
-echo "export VERSION=${VERSION}" >> $HOME/.bash_profile
-echo "export REPO=${REPO}" >> $HOME/.bash_profile
-echo "export GENESIS_FILE=${GENESIS_FILE}" >> $HOME/.bash_profile
-echo "export PEERS=${PERS}" >> $HOME/.bash_profile
-echo "export SEED=${SEED}" >> $HOME/.bash_profile
-echo "export MIN_GAS=${MIN_GAS}" >> $HOME/.bash_profile
-echo "export DENOM=${DENOM}" >> $HOME/.bash_profile
-source $HOME/.bash_profile
+echo "export EXECUTE=${EXECUTE}" >> $HOME/.node101
+echo "export CHAIN_ID=${CHAIN_ID}" >> $HOME/.node101
+echo "export PORT=${PORT}" >> $HOME/.node101
+echo "export SYSTEM_FOLDER=${SYSTEM_FOLDER}" >> $HOME/.node101
+echo "export PROJECT_FOLDER=${PROJECT_FOLDER}" >> $HOME/.node101
+echo "export VERSION=${VERSION}" >> $HOME/.node101
+echo "export REPO=${REPO}" >> $HOME/.node101
+echo "export GENESIS_FILE=${GENESIS_FILE}" >> $HOME/.node101
+echo "export PEERS=${PERS}" >> $HOME/.node101
+echo "export SEED=${SEED}" >> $HOME/.node101
+echo "export MIN_GAS=${MIN_GAS}" >> $HOME/.node101
+echo "export DENOM=${DENOM}" >> $HOME/.node101
+source $HOME/.node101
 
 
 sleep 1
 
 if [ ! $MONIKER ]; then
 	read -p "ENTER MONIKER NAME: " MONIKER
-	echo 'export MONIKER='$MONIKER >> $HOME/.bash_profile
+	echo 'export MONIKER='$MONIKER >> $HOME/.node101
 fi
 
 sleep 1
@@ -65,8 +65,8 @@ wget "https://golang.org/dl/go$ver.linux-amd64.tar.gz"
 sudo rm -rf /usr/local/go
 sudo tar -C /usr/local -xzf "go$ver.linux-amd64.tar.gz"
 rm "go$ver.linux-amd64.tar.gz"
-echo "export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin" >> ~/.bash_profile
-source ~/.bash_profile
+echo "export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin" >> ~/.node101
+source ~/.node101
 go version
 
 sleep 1
@@ -155,11 +155,11 @@ echo '=============== SETUP IS FINISHED ==================='
 echo -e "CHECK OUT YOUR LOGS : \e[1m\e[32mjournalctl -fu ${EXECUTE} -o cat\e[0m"
 echo -e "CHECK SYNC: \e[1m\e[32mcurl -s localhost:${PORT}657/status | jq .result.sync_info\e[0m"
 
-source $HOME/.bash_profile
+source $HOME/.node101
 
 if [ ! $WALLET_NAME ]; then
 	read -p "ENTER WALLET NAME : " WALLET_NAME
-	echo 'export WALLET_NAME='$WALLET_NAME >> $HOME/.bash_profile
+	echo 'export WALLET_NAME='$WALLET_NAME >> $HOME/.node101
 fi
 
 $EXECUTE keys add $WALLET_NAME

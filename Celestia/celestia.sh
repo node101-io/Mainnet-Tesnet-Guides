@@ -28,7 +28,7 @@ sleep 1
 sudo apt update && sudo apt upgrade -y && sudo apt install curl tar wget clang pkg-config libssl-dev jq build-essential bsdmainutils git make ncdu gcc git jq chrony liblz4-tool -y && sudo apt install make clang pkg-config libssl-dev build-essential git jq ncdu bsdmainutils htop net-tools lsof -y < "/dev/null"  && sudo apt-get update -y 
 sudo apt-get install wget liblz4-tool aria2 -y 
 
-ver="1.19.3"
+ver="1.19.1"
 cd $HOME
 wget "https://golang.org/dl/go$ver.linux-amd64.tar.gz"
 sudo rm -rf /usr/local/go
@@ -39,6 +39,15 @@ source ~/.node101
 go version
 
 
+cd $HOME
+rm -rf celestia-node
+git clone https://github.com/celestiaorg/celestia-node.git
+cd celestia-node/
+git checkout tags/v0.3.0-rc2
+make install
+make cel-key
+
+cd $HOME
 VERSION=v0.6.0
 echo "export VERSION=${VERSION}" >> $HOME/.node101
 source ~/.node101

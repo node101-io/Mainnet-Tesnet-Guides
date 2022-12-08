@@ -116,8 +116,13 @@ export SHENTUD_STATESYNC_TRUST_HEIGHT=$BLOCK_HEIGHT
 export SHENTUD_STATESYNC_TRUST_HASH=$TRUST_HASH
 
 # ADDRBOOK and GENESIS
-wget $GENESIS_FILE -O $HOME/$SYSTEM_FOLDER/config/genesis.json
-wget $ADDRBOOK -O $HOME/$SYSTEM_FOLDER/config/addrbook.json
+if [ $GENESIS_FILE ]; then
+	wget $GENESIS_FILE -O $HOME/$SYSTEM_FOLDER/config/genesis.json
+fi
+if [ $ADDRBOOK ]; then
+	wget $ADDRBOOK -O $HOME/$SYSTEM_FOLDER/config/addrbook.json
+fi
+
 
 SEEDS="$SEEDS"
 PEERS="$PEERS"

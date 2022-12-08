@@ -12,30 +12,16 @@ echo -e ':!:  !:!  :!:  !:!  :!:  !:!  :!:         :!:  :!:    !:!    :!:'
 echo -e ':::   ::   ::::::   :::::::   :::::::     :::   ::::::::     :::'
 echo -e '\e[0m'
 
-# Variables
-
-EXECUTE=snarkos
-REPO=https://github.com/AleoHQ/snarkOS.git --depth 1
-
-sleep 2
-
-echo "export EXECUTE=${EXECUTE}" >> $HOME/.bash_profile
-
-echo "export SYSTEM_FOLDER=${SYSTEM_FOLDER}" >> $HOME/.bash_profile
-echo "export PROJECT_FOLDER=${PROJECT_FOLDER}" >> $HOME/.bash_profile
-echo "export REPO=${REPO}" >> $HOME/.bash_profile
-source $HOME/.bash_profile
-
 sleep 1
 
 sudo curl https://sh.rustup.rs -sSf | sh -s -- -y
 
-source "$HOME/.cargo/env"
+source "$HOME/.cargo/env"  &&  rustup update 
 
 sudo apt -y install cmake && sudo apt-get update && sudo apt-get install ufw && sudo ufw enable && sudo apt install make clang pkg-config libssl-dev build-essential git jq ncdu bsdmainutils htop net-tools lsof -y < "/dev/null"
 apt install cargo
 
-cd snarkOS && sudo ./build_ubuntu.sh && source "$HOME/.cargo/env" && cargo install --path .  && ./run-client.sh
+sudo git clone https://github.com/AleoHQ/snarkOS.git --depth 1 && cd snarkOS && sudo ./build_ubuntu.sh && source "$HOME/.cargo/env" && cargo install --path .  && ./run-client.sh
 
 mkdir $HOME/aleo
 snarkos account new >>$HOME/aleo/account.txt

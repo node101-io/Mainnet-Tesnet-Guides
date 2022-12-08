@@ -12,7 +12,6 @@ echo -e ':!:  !:!  :!:  !:!  :!:  !:!  :!:         :!:  :!:    !:!    :!:'
 echo -e ':::   ::   ::::::   :::::::   :::::::     :::   ::::::::     :::'
 echo -e '\e[0m'
 
-sleep 2
 
 # Variables
 
@@ -85,40 +84,15 @@ git checkout $VERSION ; make install
 sleep 1
 
 $EXECUTE config chain-id $CHAIN_ID
-$EXECUTE config keyring-backend file
 $EXECUTE init $MONIKER --chain-id $CHAIN_ID
-
-if [ $BIN_FILES_URL ]; then
-    wget -qO- $BIN_FILES_URL | tar xvz -C $HOME/$SYSTEM_FOLDER/
-	$EXECUTE tendermint unsafe-reset-all
-fi
-
-set -ux
-set -e
-set -v
-
-# Please, update to RPC_ADDR to 3.236.161.42:26657 if you like to use Certik official RPC Node
-# Given address is DSRV RPC Node Address.
-RPC_ADDR="165.232.72.33:26657"
-INTERVAL=1500
-
-LATEST_HEIGHT=$(curl -s $RPC_ADDR/block | jq -r .result.block.header.height);
-BLOCK_HEIGHT=$(($LATEST_HEIGHT-$INTERVAL))
-TRUST_HASH=$(curl -s "$RPC_ADDR/block?height=$BLOCK_HEIGHT" | jq -r .result.block_id.hash)
-
-# TELL USER WHAT WE ARE DOING
-echo "TRUST HEIGHT: $BLOCK_HEIGHT"
-echo "TRUST HASH: $TRUST_HASH"
-
-export SHENTUD_STATESYNC_ENABLE=true
-export SHENTUD_STATESYNC_RPC_SERVERS="$RPC_ADDR,$RPC_ADDR"
-export SHENTUD_STATESYNC_TRUST_HEIGHT=$BLOCK_HEIGHT
-export SHENTUD_STATESYNC_TRUST_HASH=$TRUST_HASH
 
 # ADDRBOOK and GENESIS
 if [ $GENESIS_FILE ]; then
 	wget $GENESIS_FILE -O $HOME/$SYSTEM_FOLDER/config/genesis.json
 fi
+
+sleep 1
+
 if [ $ADDRBOOK ]; then
 	wget $ADDRBOOK -O $HOME/$SYSTEM_FOLDER/config/addrbook.json
 fi
@@ -175,6 +149,34 @@ EOF
 sudo systemctl daemon-reload
 sudo systemctl enable $EXECUTE
 sudo systemctl restart $EXECUTE
+
+
+if [ $BIN_FILES_URL ]; then
+    wget -qO- $BIN_FILES_URL | tar xvz -C $HOME/$SYSTEM_FOLDER/
+	$EXECUTE tendermint unsafe-reset-all
+fi
+
+# set -ux
+# set -e
+# set -v
+
+# Please, update to RPC_ADDR to 3.236.161.42:26657 if you like to use Certik official RPC Node
+# Given address is DSRV RPC Node Address.
+# RPC_ADDR="165.232.72.33:26657"
+# INTERVAL=1500
+
+# LATEST_HEIGHT=$(curl -s $RPC_ADDR/block | jq -r .result.block.header.height);
+# BLOCK_HEIGHT=$(($LATEST_HEIGHT-$INTERVAL))
+# TRUST_HASH=$(curl -s "$RPC_ADDR/block?height=$BLOCK_HEIGHT" | jq -r .result.block_id.hash)
+
+# TELL USER WHAT WE ARE DOING
+# echo "TRUST HEIGHT: $BLOCK_HEIGHT"
+# echo "TRUST HASH: $TRUST_HASH"
+
+# export SHENTUD_STATESYNC_ENABLE=true
+# export SHENTUD_STATESYNC_RPC_SERVERS="$RPC_ADDR,$RPC_ADDR"
+# export SHENTUD_STATESYNC_TRUST_HEIGHT=$BLOCK_HEIGHT
+# export SHENTUD_STATESYNC_TRUST_HASH=$TRUST_HASH
 
 echo '=============== SETUP IS FINISHED ==================='
 echo -e "CHECK OUT YOUR LOGS : \e[1m\e[32mjournalctl -fu ${EXECUTE} -o cat\e[0m"

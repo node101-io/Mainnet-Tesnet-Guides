@@ -42,10 +42,10 @@ echo "export VERSION=${VERSION}" >> $HOME/.bash_profile
 echo "export REPO=${REPO}" >> $HOME/.bash_profile
 echo "export GENESIS_FILE=${GENESIS_FILE}" >> $HOME/.bash_profile
 echo "export PEERS=${PEERS}" >> $HOME/.bash_profile
-echo "export SEED=${SEED}" >> $HOME/.bash_profile
+echo "export SEEDS=${SEEDS}" >> $HOME/.bash_profile
 echo "export MIN_GAS=${MIN_GAS}" >> $HOME/.bash_profile
 echo "export DENOM=${DENOM}" >> $HOME/.bash_profile
-source $HOME/.bash_profile
+
 
 sleep 1
 

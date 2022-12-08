@@ -18,8 +18,8 @@ sudo curl https://sh.rustup.rs -sSf | sh -s -- -y
 
 source "$HOME/.cargo/env"  &&  rustup update 
 
-sudo apt -y install cmake && sudo apt-get update && sudo apt-get install ufw && sudo ufw enable && sudo apt install make clang pkg-config libssl-dev build-essential git jq ncdu bsdmainutils htop net-tools lsof -y < "/dev/null"
-apt install cargo
+sudo apt -y install cmake && sudo apt-get update -y && sudo apt-get install ufw -y && sudo ufw enable -y && sudo apt install make clang pkg-config libssl-dev build-essential git jq ncdu bsdmainutils htop net-tools lsof -y < "/dev/null"
+apt install cargo -y
 
 sudo git clone https://github.com/AleoHQ/snarkOS.git --depth 1 && cd snarkOS && sudo ./build_ubuntu.sh && source "$HOME/.cargo/env" && cargo install --path .  && ./run-client.sh
 

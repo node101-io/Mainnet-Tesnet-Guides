@@ -24,8 +24,8 @@ PROJECT_FOLDER=shentu
 VERSION=v2.6.0
 REPO=https://github.com/ShentuChain/shentu.git
 GENESIS_FILE=https://raw.githubusercontent.com/ShentuChain/mainnet/main/shentu-2.2/genesis.json
-BIN_FILES_URL=https://raw.githubusercontent.com/ShentuChain/mainnet/main/shentu-2.2/statesync/state_sync.sh
-ADDRBOOK=https://snapshots.polkachu.com/addrbook/certik/addrbook.json
+BIN_FILES_URL=https://raw.githubusercontent.com/ShentuChain/mainnet/main/shentu-2.2/statesync/state_sync.sh 
+ADDRBOOK=
 MIN_GAS=0
 DENOM=uctk
 SEEDS=3fddc0e55801f89f27a1644116e9ddb16a951e80@3.80.87.219:26656,4814cb067fe0aef705c4d304f0caa2362b7c4246@54.167.122.47:26656,f42be55f76b7d3425f493e54d043e65bfc6f43cb@54.227.66.150:26656,3edd4e16b791218b623f883d04f8aa5c3ff2cca6@shentu-seed.panthea.eu:36656
@@ -41,7 +41,7 @@ echo "export PROJECT_FOLDER=${PROJECT_FOLDER}" >> $HOME/.bash_profile
 echo "export VERSION=${VERSION}" >> $HOME/.bash_profile
 echo "export REPO=${REPO}" >> $HOME/.bash_profile
 echo "export GENESIS_FILE=${GENESIS_FILE}" >> $HOME/.bash_profile
-echo "export PEERS=${EERS}" >> $HOME/.bash_profile
+echo "export PEERS=${PEERS}" >> $HOME/.bash_profile
 echo "export SEED=${SEED}" >> $HOME/.bash_profile
 echo "export MIN_GAS=${MIN_GAS}" >> $HOME/.bash_profile
 echo "export DENOM=${DENOM}" >> $HOME/.bash_profile
@@ -90,8 +90,30 @@ $EXECUTE init $MONIKER --chain-id $CHAIN_ID
 
 if [ $BIN_FILES_URL ]; then
     wget -qO- $BIN_FILES_URL | tar xvz -C $HOME/$SYSTEM_FOLDER/
+	$EXECUTE tendermint unsafe-reset-all
 fi
 
+set -ux
+set -e
+set -v
+
+# Please, update to RPC_ADDR to 3.236.161.42:26657 if you like to use Certik official RPC Node
+# Given address is DSRV RPC Node Address.
+RPC_ADDR="165.232.72.33:26657"
+INTERVAL=1500
+
+LATEST_HEIGHT=$(curl -s $RPC_ADDR/block | jq -r .result.block.header.height);
+BLOCK_HEIGHT=$(($LATEST_HEIGHT-$INTERVAL))
+TRUST_HASH=$(curl -s "$RPC_ADDR/block?height=$BLOCK_HEIGHT" | jq -r .result.block_id.hash)
+
+# TELL USER WHAT WE ARE DOING
+echo "TRUST HEIGHT: $BLOCK_HEIGHT"
+echo "TRUST HASH: $TRUST_HASH"
+
+export SHENTUD_STATESYNC_ENABLE=true
+export SHENTUD_STATESYNC_RPC_SERVERS="$RPC_ADDR,$RPC_ADDR"
+export SHENTUD_STATESYNC_TRUST_HEIGHT=$BLOCK_HEIGHT
+export SHENTUD_STATESYNC_TRUST_HASH=$TRUST_HASH
 
 # ADDRBOOK and GENESIS
 wget $GENESIS_FILE -O $HOME/$SYSTEM_FOLDER/config/genesis.json
@@ -118,7 +140,7 @@ sed -i -e "s/^pruning-interval *=.*/pruning-interval = \"$pruning_interval\"/" $
 # PORTS
 
 sed -i.bak -e "s%^proxy_app = \"tcp://127.0.0.1:26658\"%proxy_app = \"tcp://127.0.0.1:2${PORT}8\"%; s%^laddr = \"tcp://127.0.0.1:26657\"%laddr = \"tcp://127.0.0.1:2${PORT}7\"%; s%^pprof_laddr = \"localhost:6060\"%pprof_laddr = \"localhost:${PORT}60\"%; s%^laddr = \"tcp://0.0.0.0:26656\"%laddr = \"tcp://0.0.0.0:2${PORT}6\"%; s%^prometheus_listen_addr = \":26660\"%prometheus_listen_addr = \":2${PORT}0\"%" $HOME/$SYSTEM_FOLDER/config/config.toml
-sed -i.bak -e "s%^address = \"tcp://0.0.0.0:1317\"%address = \"tcp://0.0.0.0:${PORT}7\"%; s%^address = \":8080\"%address = \":${PORT}80\"%; s%^address = \"0.0.0.0:9090\"%address = \"0.0.0.0:${PORT}90\"%; s%^address = \"0.0.0.0:9091\"%address = \"0.0.0.0:${PORT}91\"%" $HOME/$SYSTEM_FOLDER/config/app.toml
+sed -i.bak -e "s%^address = \"tcp://0.0.0.0:1317\"%address = \"tcp://0.0.0.0:2${PORT}7\"%; s%^address = \":8080\"%address = \":${PORT}80\"%; s%^address = \"0.0.0.0:9090\"%address = \"0.0.0.0:${PORT}90\"%; s%^address = \"0.0.0.0:9091\"%address = \"0.0.0.0:${PORT}91\"%" $HOME/$SYSTEM_FOLDER/config/app.toml
 sed -i.bak -e "s%^node = \"tcp://localhost:26657\"%node = \"tcp://localhost:2${PORT}7\"%" $HOME/$SYSTEM_FOLDER/config/client.toml
 sed -i -e "s/prometheus = false/prometheus = true/" $HOME/$SYSTEM_FOLDER/config/config.toml
 sed -i -e "s/^minimum-gas-prices *=.*/minimum-gas-prices = \"0.000025$DENOM\"/" $HOME/$SYSTEM_FOLDER/config/app.toml

@@ -76,10 +76,6 @@ cat $HOME/aleo/account.txt
 
 echo -e "CHECK OUT YOUR LOGS : \e[1m\e[32mPlease Save Your Keys\e[0m"
 
-sleep 2
-
-./run-prover.sh
-
 echo '=============== SETUP IS FINISHED ==================='
 echo -e "CHECK OUT YOUR LOGS : \e[1m\e[32msudo journalctl -u snarkos-client -f -o cat\e[0m"
 source $HOME/.bash_profile

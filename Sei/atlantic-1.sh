@@ -12,25 +12,26 @@ echo -e ':!:  !:!  :!:  !:!  :!:  !:!  :!:         :!:  :!:    !:!    :!:'
 echo -e ':::   ::   ::::::   :::::::   :::::::     :::   ::::::::     :::'
 echo -e '\e[0m'
 
+cd $HOME && sudo apt update  &&  sudo apt install make clang pkg-config libssl-dev build-essential git jq ncdu bsdmainutils htop -y < "/dev/null"
+
 # Variables
 
-EXECUTE=seid
+APP=seid
 CHAIN_ID=atlantic-1
 PORT=56
 SYSTEM_FOLDER=.sei
 PROJECT_FOLDER=sei-chain
-VERSION=origin/1.0.1beta-upgrade
+VERSION=caa4c602c8f4cec37b113064e0d5e9cdb7173bed
 REPO=https://github.com/sei-protocol/sei-chain
-GENESIS_FILE=https://raw.githubusercontent.com/sei-protocol/testnet/main/atlantic-subchains/atlantic-sub-2/genesis.json
-SNAPSHOT=
-ADDRBOOK=https://raw.githubusercontent.com/sei-protocol/testnet/main/atlantic-subchains/atlantic-sub-2/addrbook.json
+GENESIS_FILE=https://raw.githubusercontent.com/sei-protocol/testnet/main/sei-incentivized-testnet/genesis.json
+ADDRBOOK=https://raw.githubusercontent.com/sei-protocol/testnet/main/sei-incentivized-testnet/addrbook.json
 DENOM=usei
-SEEDS=
+SEEDS=df1f6617ff5acdc85d9daa890300a57a9d956e5e@sei-atlantic-1.seed.rhinostake.com:16660
 PEERS=
 
 sleep 2
 
-echo "export EXECUTE=${EXECUTE}" >> $HOME/.bash_profile
+echo "export APP=${APP}" >> $HOME/.bash_profile
 echo "export CHAIN_ID=${CHAIN_ID}" >> $HOME/.bash_profile
 echo "export PORT=${PORT}" >> $HOME/.bash_profile
 echo "export SYSTEM_FOLDER=${SYSTEM_FOLDER}" >> $HOME/.bash_profile
@@ -57,12 +58,7 @@ if [ ! $WALLET_NAME ]; then
 	echo 'export WALLET_NAME='$WALLET_NAME >> $HOME/.bash_profile
 fi
 
-# Updates
-
-sudo apt update && sudo apt upgrade -y && sudo apt install curl tar wget clang pkg-config libssl-dev jq build-essential bsdmainutils git make ncdu gcc git jq chrony liblz4-tool -y && sudo apt install make clang pkg-config libssl-dev build-essential git jq ncdu bsdmainutils htop net-tools lsof -y < "/dev/null"  && sudo apt-get update -y 
-sudo apt-get install wget liblz4-tool aria2 -y 
-
-ver="1.19.3"
+ver="1.18.1"
 cd $HOME
 wget "https://golang.org/dl/go$ver.linux-amd64.tar.gz"
 sudo rm -rf /usr/local/go
@@ -70,24 +66,18 @@ sudo tar -C /usr/local -xzf "go$ver.linux-amd64.tar.gz"
 rm "go$ver.linux-amd64.tar.gz"
 echo "export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin" >> ~/.bash_profile
 source ~/.bash_profile
-go version
 
 sleep 1
 
 git clone $REPO
 cd $PROJECT_FOLDER
 git checkout $VERSION ; make install
-mv $HOME/go/bin/seid /usr/bin/
+mv $HOME/go/bin/$APP /usr/local/bin/
 
 sleep 1
 
-$EXECUTE config chain-id $CHAIN_ID
-$EXECUTE init $MONIKER --chain-id $CHAIN_ID
-
-if [ $SNAPSHOT ]; then
-    wget -qO- $SNAPSHOT | tar xvz -C $HOME/$SYSTEM_FOLDER/
-fi
-
+$APP config chain-id $CHAIN_ID
+$APP init $MONIKER --chain-id $CHAIN_ID
 
 # ADDRBOOK and GENESIS
 if [ $GENESIS_FILE ]; then 
@@ -102,7 +92,6 @@ SEEDS="$SEEDS"
 PEERS="$PEERS"
 sed -i -e "s/^seeds *=.*/seeds = \"$SEEDS\"/; s/^persistent_peers *=.*/persistent_peers = \"$PEERS\"/" $HOME/$SYSTEM_FOLDER/config/config.toml
 sed -i.bak -e "s/^persistent_peers *=.*/persistent_peers = \"$PEERS\"/" $HOME/$SYSTEM_FOLDER/config/config.toml
-
 
 sleep 1
 
@@ -128,30 +117,55 @@ sleep 1
 indexer="null" && \
 sed -i -e "s/^indexer *=.*/indexer = \"$indexer\"/" $HOME/$SYSTEM_FOLDER/config/config.toml
 
-$EXECUTE tendermint unsafe-reset-all --home $HOME/$SYSTEM_FOLDER
-
 # Creating your systemd service
-sudo tee /etc/systemd/system/$EXECUTE.service > /dev/null <<EOF
+
+sudo tee /etc/systemd/system/$APP.service > /dev/null <<EOF
 [Unit]
-Description=$EXECUTE
+Description=Seid Node
 After=network.target
+
 [Service]
-Type=simple
 User=$USER
-ExecStart=$(which $EXECUTE) start
+Type=simple
+ExecStart=$(which $APP) start
 Restart=on-failure
-RestartSec=10
 LimitNOFILE=65535
+
 [Install]
-WantedBy=multi-user.target
+WantedBy=multi-user.target" > $HOME/$APP.service
+sudo mv $HOME/$APP.service /etc/systemd/system
+sudo tee <<EOF >/dev/null /etc/systemd/journald.conf
+Storage=persistent
 EOF
 
+echo "
+sudo systemctl restart systemd-journald
 sudo systemctl daemon-reload
-sudo systemctl enable $EXECUTE
-sudo systemctl restart $EXECUTE
+sudo systemctl enable $APP
+sudo systemctl restart $APP
+
+sudo systemctl stop $APP
+cp $HOME/$SYSTEM_FOLDER/data/priv_validator_state.json $HOME/$SYSTEM_FOLDER/priv_validator_state.json.backup
+$APP tendermint unsafe-reset-all --home $HOME/$SYSTEM_FOLDER
+STATE_SYNC_RPC=http://rpc$SYSTEM_FOLDER.ppnv.space:25657
+STATE_SYNC_PEER=fb5a1e3ff90033ecb138eff5f93fd4befcdc7ab6@rpc$SYSTEM_FOLDER.ppnv.space:25656
+LATEST_HEIGHT=$(curl -s $STATE_SYNC_RPC/block | jq -r .result.block.header.height)
+SYNC_BLOCK_HEIGHT=$(($LATEST_HEIGHT - 1000))
+SYNC_BLOCK_HASH=$(curl -s "$STATE_SYNC_RPC/block?height=$SYNC_BLOCK_HEIGHT" | jq -r .result.block_id.hash)
+sed -i.bak -e "s|^enable *=.*|enable = true|" $HOME/$SYSTEM_FOLDER/config/config.toml
+sed -i.bak -e "s|^rpc_servers *=.*|rpc_servers = \"$STATE_SYNC_RPC,$STATE_SYNC_RPC\"|" \
+  $HOME/$SYSTEM_FOLDER/config/config.toml
+sed -i.bak -e "s|^trust_height *=.*|trust_height = $SYNC_BLOCK_HEIGHT|" \
+  $HOME/$SYSTEM_FOLDER/config/config.toml
+sed -i.bak -e "s|^trust_hash *=.*|trust_hash = \"$SYNC_BLOCK_HASH\"|" \
+  $HOME/$SYSTEM_FOLDER/config/config.toml
+sed -i.bak -e "s|^persistent_peers *=.*|persistent_peers = \"$STATE_SYNC_PEER\"|" \
+  $HOME/$SYSTEM_FOLDER/config/config.toml
+mv $HOME/$SYSTEM_FOLDER/priv_validator_state.json.backup $HOME/$SYSTEM_FOLDER/data/priv_validator_state.json
+sudo systemctl restart $APP && journalctl -u $APP -f --no-hostname -o cat
 
 echo '=============== SETUP IS FINISHED ==================='
-echo -e "CHECK OUT YOUR LOGS : \e[1m\e[32mjournalctl -fu ${EXECUTE} -o cat\e[0m"
+echo -e "CHECK OUT YOUR LOGS : \e[1m\e[32mjournalctl -fu ${APP} -o cat\e[0m"
 echo -e "CHECK SYNC: \e[1m\e[32mcurl -s localhost:${PORT}657/status | jq .result.sync_info\e[0m"
 
 source $HOME/.bash_profile

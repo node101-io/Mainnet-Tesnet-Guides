@@ -164,6 +164,18 @@ sed -i.bak -e "s|^persistent_peers *=.*|persistent_peers = \"$STATE_SYNC_PEER\"|
 mv $HOME/$SYSTEM_FOLDER/priv_validator_state.json.backup $HOME/$SYSTEM_FOLDER/data/priv_validator_state.json
 sudo systemctl restart $APP && journalctl -u $APP -f --no-hostname -o cat
 
+echo -e '\e[0m'
+echo -e ' @@@@@@   @@@@@@@@  @@@      @@@@@@   @@@@@@@  @@@        @@@@@@   @@@  @@@  @@@@@@@  @@@   @@@@@@@               @@@'
+echo -e '@@@@@@@   @@@@@@@@  @@@     @@@@@@@@  @@@@@@@  @@@       @@@@@@@@  @@@@ @@@  @@@@@@@  @@@  @@@@@@@@              @@@@'
+echo -e '!@@       @@!       @@!     @@!  @@@    @@!    @@!       @@!  @@@  @@!@!@@@    @@!    @@!  !@@                  @@@!!'
+echo -e '!@!       !@!       !@!     !@!  @!@    !@!    !@!       !@!  @!@  !@!!@!@!    !@!    !@!  !@!                    !@!'
+echo -e '!!@@!!    @!!!:!    !!@     @!@!@!@!    @!!    @!!       @!@!@!@!  @!@ !!@!    @!!    !!@  !@!       @!@!@!@!@    @!@'
+echo -e ' !!@!!!   !!!!!:    !!!     !!!@!!!!    !!!    !!!       !!!@!!!!  !@!  !!!    !!!    !!!  !!!       !!!@!@!!!    !@!'
+echo -e '     !:!  !!:       !!:     !!:  !!!    !!:    !!:       !!:  !!!  !!:  !!!    !!:    !!:  :!!                    !!:'
+echo -e '    !:!   :!:       :!:     :!:  !:!    :!:     :!:      :!:  !:!  :!:  !:!    :!:    :!:  :!:                    :!:'
+echo -e ':::: ::    :: ::::   ::     ::   :::     ::     :: ::::  ::   :::   ::   ::     ::     ::   ::: :::               :::'
+echo -e '\e[0m'
+
 echo '=============== SETUP IS FINISHED ==================='
 echo -e "CHECK OUT YOUR LOGS : \e[1m\e[32mjournalctl -fu ${APP} -o cat\e[0m"
 echo -e "CHECK SYNC: \e[1m\e[32mcurl -s localhost:${PORT}657/status | jq .result.sync_info\e[0m"

@@ -17,7 +17,7 @@ echo -e '\e[0m'
 EXECUTE=seid
 CHAIN_ID=atlantic-1
 PORT=56
-SYSTEM_FOLDER=.seid
+SYSTEM_FOLDER=.sei
 PROJECT_FOLDER=sei-chain
 VERSION=origin/1.0.1beta-upgrade
 REPO=https://github.com/sei-protocol/sei-chain

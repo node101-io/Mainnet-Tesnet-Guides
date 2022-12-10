@@ -21,7 +21,7 @@ CHAIN_ID=atlantic-1
 PORT=56
 SYSTEM_FOLDER=.sei
 PROJECT_FOLDER=sei-chain
-VERSION=caa4c602c8f4cec37b113064e0d5e9cdb7173bed
+VERSION=origin/1.0.1beta-upgrade
 REPO=https://github.com/sei-protocol/sei-chain
 GENESIS_FILE=https://raw.githubusercontent.com/sei-protocol/testnet/main/sei-incentivized-testnet/genesis.json
 ADDRBOOK=https://raw.githubusercontent.com/sei-protocol/testnet/main/sei-incentivized-testnet/addrbook.json
@@ -72,7 +72,7 @@ sleep 1
 git clone $REPO
 cd $PROJECT_FOLDER
 git checkout $VERSION ; make install
-mv $HOME/go/bin/$APP /usr/local/bin/
+mv $HOME/go/bin/$APP /usr/bin/
 
 sleep 1
 
@@ -111,7 +111,7 @@ sed -i.bak -e "s%^proxy_app = \"tcp://127.0.0.1:26658\"%proxy_app = \"tcp://127.
 sed -i.bak -e "s%^address = \"tcp://0.0.0.0:1317\"%address = \"tcp://0.0.0.0:2${PORT}7\"%; s%^address = \":8080\"%address = \":${PORT}80\"%; s%^address = \"0.0.0.0:9090\"%address = \"0.0.0.0:${PORT}90\"%; s%^address = \"0.0.0.0:9091\"%address = \"0.0.0.0:${PORT}91\"%" $HOME/$SYSTEM_FOLDER/config/app.toml
 sed -i.bak -e "s%^node = \"tcp://localhost:26657\"%node = \"tcp://localhost:2${PORT}7\"%" $HOME/$SYSTEM_FOLDER/config/client.toml
 sed -i -e "s/prometheus = false/prometheus = true/" $HOME/$SYSTEM_FOLDER/config/config.toml
-sed -i -e "s/^minimum-gas-prices *=.*/minimum-gas-prices = \"0.01$DENOM\"/" $HOME/$SYSTEM_FOLDER/config/app.toml
+sed -i -e "s/^minimum-gas-prices *=.*/minimum-gas-prices = \"0.000025$DENOM\"/" $HOME/$SYSTEM_FOLDER/config/app.toml
 
 sleep 1 
 indexer="null" && \
@@ -119,28 +119,31 @@ sed -i -e "s/^indexer *=.*/indexer = \"$indexer\"/" $HOME/$SYSTEM_FOLDER/config/
 
 # Creating your systemd service
 
-echo "[Unit]
-Description=Seid Node
+sudo tee /etc/systemd/system/$EXECUTE.service > /dev/null <<EOF
+[Unit]
+Description=Sei-Network Node
 After=network.target
 
 [Service]
-User=$USER
 Type=simple
-ExecStart=$(which $APP) start
+User=root
+WorkingDirectory=/root/
+ExecStart=/root/go/bin/seid start
 Restart=on-failure
+StartLimitInterval=0
+RestartSec=3
 LimitNOFILE=65535
+LimitMEMLOCK=209715200
 
 [Install]
-WantedBy=multi-user.target" > $HOME/$APP.service
-sudo mv $HOME/$APP.service /etc/systemd/system
-sudo tee <<EOF >/dev/null /etc/systemd/journald.conf
-Storage=persistent
+WantedBy=multi-user.target
 EOF
 
-sudo systemctl restart systemd-journald
+
 sudo systemctl daemon-reload
-sudo systemctl enable $APP
-sudo systemctl restart $APP
+sudo systemctl enable $EXECUTE
+sudo systemctl restart $EXECUTE
+sudo systemctl restart systemd-journald
 
 sleep 1 
 

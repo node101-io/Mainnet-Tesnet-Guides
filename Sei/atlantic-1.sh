@@ -119,8 +119,7 @@ sed -i -e "s/^indexer *=.*/indexer = \"$indexer\"/" $HOME/$SYSTEM_FOLDER/config/
 
 # Creating your systemd service
 
-sudo tee /etc/systemd/system/$APP.service > /dev/null <<EOF
-[Unit]
+echo "[Unit]
 Description=Seid Node
 After=network.target
 
@@ -138,7 +137,6 @@ sudo tee <<EOF >/dev/null /etc/systemd/journald.conf
 Storage=persistent
 EOF
 
-echo "
 sudo systemctl restart systemd-journald
 sudo systemctl daemon-reload
 sudo systemctl enable $APP
@@ -162,7 +160,9 @@ sed -i.bak -e "s|^trust_hash *=.*|trust_hash = \"$SYNC_BLOCK_HASH\"|" \
 sed -i.bak -e "s|^persistent_peers *=.*|persistent_peers = \"$STATE_SYNC_PEER\"|" \
   $HOME/$SYSTEM_FOLDER/config/config.toml
 mv $HOME/$SYSTEM_FOLDER/priv_validator_state.json.backup $HOME/$SYSTEM_FOLDER/data/priv_validator_state.json
-sudo systemctl restart $APP && journalctl -u $APP -f --no-hostname -o cat
+sudo systemctl restart $APP
+
+sleep 1 
 
 echo -e '\e[0m'
 echo -e ' @@@@@@   @@@@@@@@  @@@      @@@@@@   @@@@@@@  @@@        @@@@@@   @@@  @@@  @@@@@@@  @@@   @@@@@@@               @@@'
@@ -179,5 +179,4 @@ echo -e '\e[0m'
 echo '=============== SETUP IS FINISHED ==================='
 echo -e "CHECK OUT YOUR LOGS : \e[1m\e[32mjournalctl -fu ${APP} -o cat\e[0m"
 echo -e "CHECK SYNC: \e[1m\e[32mcurl -s localhost:${PORT}657/status | jq .result.sync_info\e[0m"
-
 source $HOME/.bash_profile

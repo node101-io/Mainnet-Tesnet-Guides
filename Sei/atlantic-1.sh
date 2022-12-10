@@ -24,7 +24,6 @@ REPO=https://github.com/sei-protocol/sei-chain
 GENESIS_FILE=https://raw.githubusercontent.com/sei-protocol/testnet/main/atlantic-subchains/atlantic-sub-2/genesis.json
 SNAPSHOT=
 ADDRBOOK=https://raw.githubusercontent.com/sei-protocol/testnet/main/atlantic-subchains/atlantic-sub-2/addrbook.json
-MIN_GAS=0
 DENOM=usei
 SEEDS=
 PEERS=
@@ -41,7 +40,6 @@ echo "export REPO=${REPO}" >> $HOME/.bash_profile
 echo "export GENESIS_FILE=${GENESIS_FILE}" >> $HOME/.bash_profile
 echo "export PEERS=${PEERS}" >> $HOME/.bash_profile
 echo "export SEEDS=${SEEDS}" >> $HOME/.bash_profile
-echo "export MIN_GAS=${MIN_GAS}" >> $HOME/.bash_profile
 echo "export DENOM=${DENOM}" >> $HOME/.bash_profile
 source $HOME/.bash_profile
 

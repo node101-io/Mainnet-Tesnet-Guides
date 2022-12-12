@@ -26,7 +26,7 @@ REPO=https://github.com/sei-protocol/sei-chain
 GENESIS_FILE=https://raw.githubusercontent.com/sei-protocol/testnet/main/sei-incentivized-testnet/genesis.json
 ADDRBOOK=https://raw.githubusercontent.com/sei-protocol/testnet/main/sei-incentivized-testnet/addrbook.json
 DENOM=usei
-SEEDS=df1f6617ff5acdc85d9daa890300a57a9d956e5e@sei-atlantic-1.seed.rhinostake.com:16660
+SEEDS=
 PEERS=
 
 sleep 2

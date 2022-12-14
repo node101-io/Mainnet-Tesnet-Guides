@@ -17,6 +17,7 @@ echo -e '\e[0m'
 export GAIA_BRANCH=v7.0.0
 export GENESIS_ZIPPED_URL=https://github.com/cosmos/testnets/raw/master/public/genesis.json.gz
 export NODE_HOME=$HOME/.gaia
+export SYSTEM_FOLDER=$HOME/.gaia
 export CHAIN_ID=theta-testnet-001
 export NODE_MONIKER=node101 # only really need to change this one
 export BINARY=gaiad
@@ -72,70 +73,70 @@ wget $GENESIS_ZIPPED_URL
 gunzip genesis.json.gz 
 
 echo "configuring chain..."
-$BINARY config chain-id $CHAIN_ID --home $NODE_HOME
-$BINARY config keyring-backend test --home $NODE_HOME
-$BINARY config broadcast-mode block --home $NODE_HOME
+$BINARY config chain-id $CHAIN_ID --home $SYSTEM_FOLDER
+$BINARY config keyring-backend test --home $SYSTEM_FOLDER
+$BINARY config broadcast-mode block --home $SYSTEM_FOLDER
 $BINARY init $NODE_MONIKER --home $NODE_HOME --chain-id=$CHAIN_ID
 
 if $STATE_SYNC; then
     echo "enabling state sync..."
-    sed -i -e '/enable =/ s/= .*/= true/' $NODE_HOME/config/config.toml
-    sed -i -e "/trust_height =/ s/= .*/= $TRUST_HEIGHT/" $NODE_HOME/config/config.toml
-    sed -i -e "/trust_hash =/ s/= .*/= \"$TRUST_HASH\"/" $NODE_HOME/config/config.toml
-    sed -i -e "/rpc_servers =/ s/= .*/= \"$SYNC_RPC\"/" $NODE_HOME/config/config.toml
+    sed -i -e '/enable =/ s/= .*/= true/' $SYSTEM_FOLDER/config/config.toml
+    sed -i -e "/trust_height =/ s/= .*/= $TRUST_HEIGHT/" $SYSTEM_FOLDER/config/config.toml
+    sed -i -e "/trust_hash =/ s/= .*/= \"$TRUST_HASH\"/" $SYSTEM_FOLDER/config/config.toml
+    sed -i -e "/rpc_servers =/ s/= .*/= \"$SYNC_RPC\"/" $SYSTEM_FOLDER/config/config.toml
 else
     echo "disabling state sync..."
 fi
 
 echo "copying over genesis file..."
-cp genesis.json $NODE_HOME/config/genesis.json
+cp genesis.json $SYSTEM_FOLDER/config/genesis.json
 
 echo "setup cosmovisor dirs..."
-mkdir -p $NODE_HOME/cosmovisor/genesis/bin
+mkdir -p $BINARY/cosmovisor/genesis/bin
 
 echo "copy binary over..."
-cp $(which gaiad) $NODE_HOME/cosmovisor/genesis/bin
+cp $(which gaiad) $BINARY/cosmovisor/genesis/bin
 
 echo "re-export binary"
-export BINARY=$NODE_HOME/cosmovisor/genesis/bin/gaiad
+export BINARY=$BINARY/cosmovisor/genesis/bin/gaiad
 
 echo "install cosmovisor"
 export GO111MODULE=on
 go install github.com/cosmos/cosmos-sdk/cosmovisor/cmd/cosmovisor@v1.0.0
 
 echo "setup systemctl"
-touch /etc/systemd/system/$NODE_MONIKER.service
+touch /etc/systemd/system/$BINARY.service
 
-echo "[Unit]"                               >> /etc/systemd/system/$NODE_MONIKER.service
-echo "Description=cosmovisor-$NODE_MONIKER" >> /etc/systemd/system/$NODE_MONIKER.service
-echo "After=network-online.target"          >> /etc/systemd/system/$NODE_MONIKER.service
-echo ""                                     >> /etc/systemd/system/$NODE_MONIKER.service
-echo "[Service]"                            >> /etc/systemd/system/$NODE_MONIKER.service
-echo "User=root"                        >> /etc/systemd/system/$NODE_MONIKER.service
-echo "ExecStart=/root/go/bin/cosmovisor start --x-crisis-skip-assert-invariants --home \$DAEMON_HOME --p2p.seeds $SEEDS" >> /etc/systemd/system/$NODE_MONIKER.service
-echo "Restart=always"                       >> /etc/systemd/system/$NODE_MONIKER.service
-echo "RestartSec=3"                         >> /etc/systemd/system/$NODE_MONIKER.service
-echo "LimitNOFILE=4096"                     >> /etc/systemd/system/$NODE_MONIKER.service
-echo "Environment='DAEMON_NAME=gaiad'"      >> /etc/systemd/system/$NODE_MONIKER.service
-echo "Environment='DAEMON_HOME=$NODE_HOME'" >> /etc/systemd/system/$NODE_MONIKER.service
-echo "Environment='DAEMON_ALLOW_DOWNLOAD_BINARIES=true'" >> /etc/systemd/system/$NODE_MONIKER.service
-echo "Environment='DAEMON_RESTART_AFTER_UPGRADE=true'" >> /etc/systemd/system/$NODE_MONIKER.service
-echo "Environment='DAEMON_LOG_BUFFER_SIZE=512'" >> /etc/systemd/system/$NODE_MONIKER.service
-echo ""                                     >> /etc/systemd/system/$NODE_MONIKER.service
-echo "[Install]"                            >> /etc/systemd/system/$NODE_MONIKER.service
-echo "WantedBy=multi-user.target"           >> /etc/systemd/system/$NODE_MONIKER.service
+echo "[Unit]"                               >> /etc/systemd/system/$BINARY.service
+echo "Description=cosmovisor-$BINARY" >> /etc/systemd/system/$BINARY.service
+echo "After=network-online.target"          >> /etc/systemd/system/$BINARY.service
+echo ""                                     >> /etc/systemd/system/$BINARY.service
+echo "[Service]"                            >> /etc/systemd/system/$BINARY.service
+echo "User=root"                        >> /etc/systemd/system/$BINARY.service
+echo "ExecStart=/root/go/bin/cosmovisor start --x-crisis-skip-assert-invariants --home \$DAEMON_HOME --p2p.seeds $SEEDS" >> /etc/systemd/system/$BINARY.service
+echo "Restart=always"                       >> /etc/systemd/system/$BINARY.service
+echo "RestartSec=3"                         >> /etc/systemd/system/$BINARY.service
+echo "LimitNOFILE=4096"                     >> /etc/systemd/system/$BINARY.service
+echo "Environment='DAEMON_NAME=gaiad'"      >> /etc/systemd/system/$BINARY.service
+echo "Environment='DAEMON_HOME=$BINARY'" >> /etc/systemd/system/$BINARY.service
+echo "Environment='DAEMON_ALLOW_DOWNLOAD_BINARIES=true'" >> /etc/systemd/system/$BINARY.service
+echo "Environment='DAEMON_RESTART_AFTER_UPGRADE=true'" >> /etc/systemd/system/$BINARY.service
+echo "Environment='DAEMON_LOG_BUFFER_SIZE=512'" >> /etc/systemd/system/$BINARY.service
+echo ""                                     >> /etc/systemd/system/$BINARY.service
+echo "[Install]"                            >> /etc/systemd/system/$BINARY.service
+echo "WantedBy=multi-user.target"           >> /etc/systemd/system/$BINARY.service
 
 echo "reload systemd..."
 sudo systemctl daemon-reload
 
 echo "starting the daemon..."
-sudo systemctl start $NODE_MONIKER.service
+sudo systemctl start $BINARY.service
 
 sudo systemctl restart systemd-journald
 
 echo "***********************"
 echo "find logs like this:"
-echo "sudo journalctl -fu $NODE_MONIKER.service"
+echo "sudo journalctl -fu $BINARY.service"
 echo "***********************"
 
 echo -e '\033[0;95m'

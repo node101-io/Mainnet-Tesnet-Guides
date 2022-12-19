@@ -101,9 +101,9 @@ rm genesis.json
 rm app.toml
 rm config.toml
 
-wget https://raw.githubusercontent.com/SynergyNodes/provenance-io-mainnet/main/genesis.json
-wget https://raw.githubusercontent.com/SynergyNodes/provenance-io-mainnet/main/app.toml
-wget https://raw.githubusercontent.com/SynergyNodes/provenance-io-mainnet/main/config.toml
+wget https://raw.githubusercontent.com/SynergyNodes/provenance-io-mainnet/main/genesis.json >> $HOME/$SYSTEM_FOLDER/config/config.toml
+wget https://raw.githubusercontent.com/SynergyNodes/provenance-io-mainnet/main/app.toml >> $HOME/$SYSTEM_FOLDER/config/config.toml
+wget https://raw.githubusercontent.com/SynergyNodes/provenance-io-mainnet/main/config.toml >> $HOME/$SYSTEM_FOLDER/config/config.toml
 
 SEEDS="$SEEDS"
 PEERS="$PEERS"
@@ -120,10 +120,10 @@ pruning_keep_every="0"
 pruning_interval="10"
 source $HOME/.bash_profile
 
-sed -i -e "s/^pruning *=.*/pruning = \"$pruning\"/" $HOME/.celestia-app/config/app.toml
-sed -i -e "s/^pruning-keep-recent *=.*/pruning-keep-recent = \"$pruning_keep_recent\"/" $HOME/.celestia-app/config/app.toml
-sed -i -e "s/^pruning-keep-every *=.*/pruning-keep-every = \"$pruning_keep_every\"/" $HOME/.celestia-app/config/app.toml
-sed -i -e "s/^pruning-interval *=.*/pruning-interval = \"$pruning_interval\"/" $HOME/.celestia-app/config/app.toml
+sed -i -e "s/^pruning *=.*/pruning = \"$pruning\"/" $HOME/$SYSTEM_FOLDER/config/app.toml
+sed -i -e "s/^pruning-keep-recent *=.*/pruning-keep-recent = \"$pruning_keep_recent\"/" $HOME/$SYSTEM_FOLDER/config/app.toml
+sed -i -e "s/^pruning-keep-every *=.*/pruning-keep-every = \"$pruning_keep_every\"/" $HOME/$SYSTEM_FOLDER/config/app.toml
+sed -i -e "s/^pruning-interval *=.*/pruning-interval = \"$pruning_interval\"/" $HOME/$SYSTEM_FOLDER/config/app.toml
 
 #Validator mode on
 sed -i.bak -e "s/^mode *=.*/mode = \"validator\"/" $HOME/$SYSTEM_FOLDER/config/config.toml
@@ -142,12 +142,14 @@ rm -rf ~/$SYSTEM_FOLDER/data
 mkdir -p ~/$SYSTEM_FOLDER/data
 SNAP_NAME=$(https://tools.highstakes.ch/files/provenance/data_2022-12-19.tar.gz | \
     egrep -o ">data_2022-12-19.*tar.gz" | tr -d ">")
-wget -O - https://snaps.qubelabs.io/celestia/${SNAP_NAME} | tar xf - \
+wget -O - https://tools.highstakes.ch/files/provenance/data_2022-12-19.tar.gz/${SNAP_NAME} | tar xf - \
     -C ~/$SYSTEM_FOLDER/data/
 
 
 # Creating your systemd service
+
 sudo tee <<EOF >/dev/null /etc/systemd/system/EXECUTE.service
+
 [Unit]
 Description=Provenance Daemon
 #After=network.target
@@ -156,7 +158,7 @@ StartLimitBurst=10
 
 [Service]
 Type=simple
-User=node
+User=$USER
 ExecStart=$(which $EXECUTE) start --home $HOME/$SYSTEM_FOLDER  --x-crisis-skip-assert-invariants
 Restart=on-abort
 RestartSec=30
@@ -167,6 +169,7 @@ WantedBy=multi-user.target
 [Service]
 LimitNOFILE=1048576
 EOF
+
 sleep 2
 
 cd provenance ; git fetch ; git pull ; git checkout v1.13.0 ; make install

@@ -16,7 +16,7 @@ echo -e '\e[0m'
 
 EXECUTE=bandd
 CHAIN_ID=laozi-mainnet
-PORT=65
+PORT=26
 SYSTEM_FOLDER=.band
 PROJECT_FOLDER=chain
 VERSION=v2.3.3
